@@ -6,6 +6,7 @@ void main() {
   runApp(const MyApp());
 }
 
+// REGION, MyAPP
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// REGION, MyAppState
 // 랜덤 영단어 생성
 // 앱이 작동하는데에 필요한 데이터 정의
 // ChangeNotifier -> 자신의 변경사항을 알릴 수 있음
@@ -52,7 +54,7 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-//
+// REGION, MyHomePage
 class MyHomePage extends StatelessWidget {
   @override
   // build() = 위젯이 항상 최신 상태를 유지하도록 위젯의 상황이 바뀔 때마다 자동으로 호출되는 메서드
@@ -117,6 +119,7 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
+// REGION, BigCard
 // 기존에 작성된 Text(pair.asLowerCase) 코드에서 Extract Widget
 // 위젯화하여 사용
 class BigCard extends StatelessWidget {
