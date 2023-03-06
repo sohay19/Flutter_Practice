@@ -126,10 +126,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-import 'package:english_words/english_words.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 
 // REGION, GeneratorPage
 class GeneratorPage extends StatelessWidget {
