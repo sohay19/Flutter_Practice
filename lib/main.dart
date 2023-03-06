@@ -33,7 +33,6 @@ class MyApp extends StatelessWidget {
 class MyAppState extends ChangeNotifier {
   // 현재 단어
   var current = WordPair.random();
-
   // 하트를 누른 단어 모음
   var favorites = <WordPair>[];
 
@@ -55,10 +54,86 @@ class MyAppState extends ChangeNotifier {
 }
 
 // REGION, MyHomePage
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key}) : super(key: key);
+
   @override
-  // build() = 위젯이 항상 최신 상태를 유지하도록 위젯의 상황이 바뀔 때마다 자동으로 호출되는 메서드
-  // 위젯 또는 중첩된 위젯 트리를 반환해야함
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+// REGION, MyHomePageState
+class _MyHomePageState extends State<MyHomePage> {
+  // 네비게이션 레일 인덱스
+  var selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget page;
+    switch (selectedIndex) {
+      case 0:
+        page = GeneratorPage();
+        break;
+      case 1:
+        // Placeholder = 교차 사각형의 UI
+        page = Placeholder();
+        break;
+      default:
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+
+    return LayoutBuilder(
+        builder: (context, constraints) {
+          return Scaffold(
+            body: Row(
+              children: [
+                // SafeArea = 하위 항목이 하드웨어 노치나 상태 표시줄에 의해 가려지지 않도록 함
+                SafeArea(
+                  // NavigationRail = 왼쪽 메뉴바
+                  child: NavigationRail(
+                    // 가로 길이가 600이상일 경우에만 확장
+                    extended: constraints.maxWidth >= 600,
+                    destinations: [
+                      // NavigationRailDestination = 각 메뉴
+                      NavigationRailDestination(
+                        icon: Icon(Icons.home),
+                        label: Text('Home'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.favorite),
+                        label: Text('Favorites'),
+                      ),
+                    ],
+                    selectedIndex: selectedIndex,
+                    onDestinationSelected: (value) {
+                      setState(() {
+                        selectedIndex = value;
+                      });
+                    },
+                  ),
+                ),
+                // NavigationRail 확장
+                Expanded(
+                  child: Container(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    // 선택된 페이지
+                    child: page,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+    );
+  }
+}
+import 'package:english_words/english_words.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+
+// REGION, GeneratorPage
+class GeneratorPage extends StatelessWidget {
+  @override
   Widget build(BuildContext context) {
     // 앱의 현재 상태에 대한 변경 사항을 추적
     var appState = context.watch<MyAppState>();
@@ -73,47 +148,40 @@ class MyHomePage extends StatelessWidget {
       icon = Icons.favorite_border;
     }
 
-    // Scaffold = 최상위 위젯
-    return Scaffold(
+    // Center = 수평 중앙
+    return Center(
       // Column = 원하는 수의 자식을 가져와 위에서 아래로 열에 넣는 레이아웃 위젯
-      // Center = 수평 중앙
-      body: Center(
-        child: Column(
-          // 수직 중앙
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 수정 후 바로 저장 -> 핫 리로드 -> 실행 중인 시뮬레이터에 바로 반영
-            Text('A random AWESOME idea:'),
-            // 텍스트와 카드 사이의 간격 넓히기
-            SizedBox(height: 10),
-            BigCard(pair: pair),
-            // 카드와 버튼 사이의 간격 넓히기
-            SizedBox(height: 10),
-            Row(
-              // 버튼 추가
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 좋아요 버튼
-                ElevatedButton.icon(
-                  onPressed: () {
-                    appState.toggleFavorite();
-                  },
-                  icon: Icon(icon),
-                  label: Text('Like'),
-                ),
-                // 버튼 간격
-                SizedBox(width: 10),
-                // 다음 버튼
-                ElevatedButton(
-                  onPressed: () {
-                    appState.getNext();
-                  },
-                  child: Text('Next'),
-                ),
-              ],
-            )
-          ], // 후행 쉼표가 없어도 되지만 일반적으로 사용하는 것을 추천, 자동 줄바꿈의 힌트
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // 영단어 카드
+          BigCard(pair: pair),
+          SizedBox(height: 10),
+          // 텍스트와 카드 사이의 간격 넓히기
+          Row(
+            // 버튼 추가
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 좋아요 버튼
+              ElevatedButton.icon(
+                onPressed: () {
+                  appState.toggleFavorite();
+                },
+                icon: Icon(icon),
+                label: Text('Like'),
+              ),
+              // 버튼 간격
+              SizedBox(width: 10),
+              // 다음 버튼
+              ElevatedButton(
+                onPressed: () {
+                  appState.getNext();
+                },
+                child: Text('Next'),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }
@@ -156,3 +224,4 @@ class BigCard extends StatelessWidget {
     );
   }
 }
+
